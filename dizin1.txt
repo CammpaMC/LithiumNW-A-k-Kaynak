@@ -1,0 +1,109 @@
+PAPER 1.21.5 | VELOCİTY INSİGTSHİMULLY
+
+KAYNAK KODLARI | KABA TASLAK | by HyperionP Moderasyon Ekibi | @hyperionp | Hiç Bir Kod Lithium NW nin Rızası Olmadan Paylaşılmaz |
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ 
+open floor|
+lobby|lobby/setspawn
+12 46 564 
+XYZ Cordinaates
+[taslakplugin]lp/set[oyuncu]
+  [taslakplugin]lpset[KURUCU]blond_red
+  package com.lithiumnw.main;
+
+[packet1]
+
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class LithiumNW implements ModInitializer {
+    public static final String MOD_ID = "lithiumnw";
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
+    @Override
+    public void onInitialize() {
+        LOGGER.info("HOS GELDİNİS.");
+
+        // Event Dinleyicilerini Kaydetme
+        registerEvents();
+
+        // Komut Yapısını Kaydetme
+        registerCommands();
+    }
+
+    private void registerEvents() {
+        // Oyuncu Sunucuya Katıldığında
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            ServerPlayerEntity player = handler.getPlayer();
+            String playerName = player.getName().getString();
+
+            // Hoş geldin mesajı ve duyuru
+            player.sendMessage(
+                Text.literal("--------------------------------------------------\n")
+                    .formatted(Formatting.DARK_GRAY)
+                    .append(Text.literal("  LITHIUM NW METAVERSE'E HOŞ GELDİN!\n").formatted(Formatting.AQUA, Formatting.BOLD))
+                    .append(Text.literal("  Sunucu IP: ").formatted(Formatting.GRAY))
+                    .append(Text.literal("oyna.lithium.nw\n").formatted(Formatting.GREEN))
+                    .append(Text.literal("--------------------------------------------------").formatted(Formatting.DARK_GRAY)),
+                false
+            );
+
+            LOGGER.info("[Lithium NW] Oyuncu giriş yaptı: " + playerName);
+        });
+
+        // Sağ Tıklama / Eşya Kullanım Etkileşimi (Örn: Lobi Profil Menüsü)
+        UseItemCallback.EVENT.register((player, world, hand) -> {
+            if (!world.isClient()) {
+                ItemStack stack = player.getStackInHand(hand);
+                
+                // Oyuncu elinde Pusula (Lobi Menüsü) tutuyorsa
+                if (stack.isOf(Items.COMPASS)) {
+                    player.sendMessage(
+                        Text.literal("[Lithium NW] ").formatted(Formatting.DARK_PURPLE)
+                            .append(Text.literal("NE ÇIKIYON YAVŞAK").formatted(Formatting.LIGHT_PURPLE)),
+                        true
+                    );
+                    return ActionResult.SUCCESS;
+                }
+            }
+            return ActionResult.PASS;
+        });
+    }
+
+    private void registerCommands() {
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            // /lithium veya /lnw komut yapısı
+            dispatcher.register(
+                CommandManager.literal("lithium")
+                    .requires(source -> source.hasPermissionLevel(2)) // Yetkili kontrolü
+                    .executes(context -> {
+                        context.getSource().sendMessage(
+                            Text.literal("Lithium NW Çekirdek Sistemi v1.0 - Aktif").formatted(Formatting.GREEN)
+                        );
+                        return 1;
+                    })
+                    .then(CommandManager.literal("reload")
+                        .executes(context -> {
+                            context.getSource().sendMessage(
+                                Text.literal("[SUNUCUNUN ADI][txt(açıklama)][sunucuıpsi)").formatted(Formatting.GOLD)
+                            );
+                            return 1;
+                        })
+                    )
+            );
+        });
+    }
+}
+  
